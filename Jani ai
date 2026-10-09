@@ -1,0 +1,290 @@
+‎
+‎<!DOCTYPE html>
+‎<html lang="en">
+‎<head>
+‎<meta charset="UTF-8">
+‎<meta name="viewport" content="width=device-width, initial-scale=1">
+‎<meta name="theme-color" content="#075e54">
+‎<title>JANI AI 👑</title>
+‎
+‎<style>
+‎*{box-sizing:border-box}
+‎:root{--green:#d9fdd3;--dark:#075e54;--bg:#f0f2f5}
+‎body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#111b21}
+‎.app{max-width:850px;height:100dvh;margin:auto;display:flex;flex-direction:column;background:#efeae2}
+‎header{background:var(--dark);color:white;padding:13px;display:flex;align-items:center;gap:12px}
+‎.avatar{width:45px;height:45px;border-radius:50%;background:white;color:var(--dark);display:grid;place-items:center;font-size:25px}
+‎.head{flex:1}h1{font-size:19px;margin:0 0 5px}small{color:#d4f5ed}
+‎button,select,textarea{font:inherit}
+‎button{cursor:pointer;border:0}
+‎#clear{background:white;border-radius:8px;padding:9px}
+‎.settings{background:white;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px}
+‎label{font-size:12px;color:#52636a}
+‎select{display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #ddd;border-radius:8px;background:white}
+‎#chat{flex:1;overflow:auto;padding:15px 12px;display:flex;flex-direction:column;gap:10px}
+‎.welcome{align-self:center;background:#fff3c4;padding:12px;border-radius:10px;text-align:center;line-height:1.5;font-size:14px}
+‎.msg{max-width:86%;padding:10px 12px;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;box-shadow:0 1px 1px #0001}
+‎.bot{align-self:flex-start;background:white;border-top-left-radius:3px}
+‎.user{align-self:flex-end;background:var(--green);border-top-right-radius:3px}
+‎.who{font-size:11px;font-weight:bold;color:#55736b;margin-bottom:4px}
+‎#status{padding:5px 12px;font-size:12px;color:#52636a}
+‎form{display:flex;align-items:flex-end;gap:8px;padding:10px;background:var(--bg)}
+‎#input{flex:1;resize:none;max-height:120px;min-height:45px;border:0;outline:0;border-radius:22px;padding:13px 15px}
+‎#send{width:46px;height:46px;border-radius:50%;background:var(--dark);color:white;font-size:20px}
+‎#send:disabled{opacity:.5}
+‎footer{text-align:center;background:var(--bg);color:#667;padding:5px;font-size:10px}
+‎@media(min-width:600px){body{padding:15px}.app{height:calc(100dvh - 30px);border-radius:14px;overflow:hidden;box-shadow:0 3px 20px #0001}}
+‎</style>
+‎</head>
+‎
+‎<body>
+‎<div class="app">
+‎<header>
+‎  <div class="avatar">👑</div>
+‎  <div class="head">
+‎    <h1>JANI AI</h1>
+‎    <small id="online">Tumhari savage bestie • Ready</small>
+‎  </div>
+‎  <button id="clear" title="New chat">🗑️</button>
+‎</header>
+‎
+‎<div class="settings">
+‎  <label>JANI ka mood
+‎    <select id="mode">
+‎      <option value="normal">Friendly bestie</option>
+‎      <option value="roast">🔥 Savage roast queen</option>
+‎      <option value="comedy">🤣 Comedy queen</option>
+‎      <option value="cute">❤️ Cute & sweet</option>
+‎      <option value="challenge">👊 Challenge mode</option>
+‎      <option value="story">📖 Story mode</option>
+‎    </select>
+‎  </label>
+‎  <label>Language
+‎    <select id="lang">
+‎      <option>Auto Detect</option>
+‎      <option>Roman Urdu</option>
+‎      <option>Urdu</option>
+‎      <option>English</option>
+‎      <option>Sindhi</option>
+‎      <option>Punjabi</option>
+‎      <option>Hindi</option>
+‎      <option>Arabic</option>
+‎      <option>French</option>
+‎      <option>Spanish</option>
+‎      <option>Chinese</option>
+‎      <option>Japanese</option>
+‎      <option>Any language</option>
+‎    </select>
+‎  </label>
+‎</div>
+‎
+‎<main id="chat" aria-live="polite">
+‎  <div class="welcome">
+‎    👑 Welcome to JANI AI!<br>
+‎    Main hoon tumhari funny, savage aur caring bestie!<br>
+‎    Bolo boss, aaj kya scene hai? 🩴🤣
+‎  </div>
+‎</main>
+‎
+‎<div id="status">JANI tumhari message ka wait kar rahi hai 😜</div>
+‎
+‎<form id="form">
+‎  <textarea id="input" rows="1" placeholder="JANI ko message karo..." aria-label="Message"></textarea>
+‎  <button id="send" type="submit">➤</button>
+‎</form>
+‎<footer>JANI AI 👑 • Single-file demo • Real AI connection requires a backend</footer>
+‎</div>
+‎
+‎<script>
+‎const $ = id => document.getElementById(id);
+‎const chat = $("chat");
+‎const input = $("input");
+‎const form = $("form");
+‎const send = $("send");
+‎let history = [];
+‎let busy = false;
+‎
+‎const emojis = ["🤣","😜","👑","💀","🥴","🩴","❤️","😤"];
+‎
+‎function addMessage(role, text) {
+‎  const box = document.createElement("div");
+‎  box.className = "msg " + (role === "user" ? "user" : "bot");
+‎  const who = document.createElement("div");
+‎  who.className = "who";
+‎  who.textContent = role === "user" ? "You" : "JANI AI 👑";
+‎  const content = document.createElement("div");
+‎  content.textContent = text;
+‎  box.append(who, content);
+‎  chat.appendChild(box);
+‎  chat.scrollTop = chat.scrollHeight;
+‎}
+‎
+‎function choose(arr) {
+‎  return arr[Math.floor(Math.random() * arr.length)];
+‎}
+‎
+‎function localReply(text) {
+‎  const t = text.toLowerCase().trim();
+‎  const mode = $("mode").value;
+‎  const lang = $("lang").value;
+‎  const english = lang === "English";
+‎  const sindhi = lang === "Sindhi";
+‎
+‎  if (/\b(hi|hello|hey|salam|assalam|aoa|salaam)\b/.test(t)) {
+‎    if (english) return "Hey boss! 👑 Your favourite troublemaker is here. What's happening?";
+‎    if (sindhi) return "Ada salam! ❤️ Chha haal aahein? JANI hazir aa!";
+‎    return choose([
+‎      "Walaikum Assalam boss! ❤️ Batao, kya haal hain?",
+‎      "Oho! Meri favourite personality aa gayi 🤣 Bolo kya scene hai?",
+‎      "JANI hazir hai, boss! 👑 Aaj kis ki class leni hai?"
+‎    ]);
+‎  }
+‎
+‎  if (/(sad|udaas|pareshan|tension|dukhi|rona|akela|depressed)/i.test(t)) {
+‎    if (english) return "Hey, I'm here with you. ❤️ Want to tell me what happened? I’ll listen without judging.";
+‎    return "Yar ❤️ mazak apni jagah, lekin agar tum pareshan ho to main sun rahi hoon. Aaram se batao kya hua. Tumhein sab kuch akele handle karne ki zaroorat nahi.";
+‎  }
+‎
+‎  if (/(love you|i love you|pyar karta|pyaar karta|mohabbat)/i.test(t)) {
+‎    return english
+‎      ? "Aww, that's sweet! ❤️ Sending bestie vibes your way."
+‎      : "Awww! ❤️ Itni mohabbat? JANI ka digital dil to khushi se nachne laga! 🤣👑";
+‎  }
+‎
+‎  if (/(tum kon|who are you|apna naam|your name)/i.test(t)) {
+‎    return english
+‎      ? "I'm JANI AI 👑 — your playful, multilingual, comedy-loving AI bestie."
+‎      : "Main JANI AI hoon 👑 Tumhari funny, savage roast queen aur caring bestie!";
+‎  }
+‎
+‎  if (/(help|madad|samjhao|batao)/i.test(t) && t.length < 35) {
+‎    return english
+‎      ? "Of course! Tell me exactly what you need help with, and we'll work through it together. ❤️"
+‎      : "Bilkul boss! ❤️ Batao kis cheez mein madad chahiye. JANI poori koshish karegi.";
+‎  }
+‎
+‎  if (mode === "roast") {
+‎    return choose([
+‎      "Boss, tumhara confidence dekh kar lagta hai logic ne aaj chhutti le li hai. 🤣",
+‎      "Tumhari entry dramatic, tumhari baat mysterious aur point abhi tak missing! 💀👑",
+‎      "Oye hoye! Itna attitude? Lagta hai mirror ne subah tumhari tareef kar di. 😜",
+‎      "Tum roast maang rahe ho ya apni beizzati ka premium subscription? 🩴🤣"
+‎    ]);
+‎  }
+‎
+‎  if (mode === "comedy") {
+‎    return choose([
+‎      "Meri comedy itni advanced hai ke joke samajhne ke liye software update chahiye. 🤣",
+‎      "Zindagi ek exam hai aur hum sab bina syllabus ke aaye hain. 💀",
+‎      "Aaj ka mission: tension ko block karo aur chai ko follow back. 😜"
+‎    ]);
+‎  }
+‎
+‎  if (mode === "cute") {
+‎    return "Awww boss! ❤️ Apna khayal rakha karo. Tumhari khushi important hai, aur JANI yahan tumhari baat sunne ke liye hai. 👑";
+‎  }
+‎
+‎  if (mode === "challenge") {
+‎    return choose([
+‎      "Challenge time! 👊 Bina calculator ke batao: 17 × 8 kitna hota hai?",
+‎      "Paheli: Aisi kya cheez hai jo tumhari hai, lekin doosre log tumse zyada istemal karte hain?",
+‎      "Word challenge! 😜 'JANI' se milta-julta ek funny nickname banao."
+‎    ]);
+‎  }
+‎
+‎  if (mode === "story") {
+‎    return "Ek dafa ka zikr hai, ek banda itna confident tha ke usne AI se kaha: 'Mujhe kabhi roast mat karna.' AI ne kaha: 'Theek hai.' Phir usne apna message dobara parha... aur khud hi hansne laga. 🤣👑\n\nBatao, agla part horror ho ya comedy?";
+‎  }
+‎
+‎  if (english) {
+‎    return choose([
+‎      "I'm listening! ❤️ Tell me a little more so I can help you better.",
+‎      "Okay boss 👑, let's figure this out together. What matters most to you here?",
+‎      "Interesting! Give me a bit more context and I'll do my best to help. 😜"
+‎    ]);
+‎  }
+‎
+‎  if (sindhi) {
+‎    return "Wah ada! ❤️ Tawhan ji galh samjhan ji koshish karyan tho. Thoro wadhik detail budhayo ta maan behtar madad kari saghan.";
+‎  }
+‎
+‎  return choose([
+‎    "Acha boss ❤️ Thora detail mein batao, taake main tumhari behtar madad kar sakoon.",
+‎    "Oho, ye baat interesting hai! 👑 Zara aur samjhao.",
+‎    "JANI sun rahi hai 😜 Tumhara matlab thora aur clear kar do.",
+‎    "Theek hai boss! Chalo is baat ko mil kar samajhte hain. ❤️"
+‎  ]);
+‎}
+‎
+‎async function reply(text) {
+‎  if (!text || busy) return;
+‎  busy = true;
+‎  send.disabled = true;
+‎  $("online").textContent = "JANI is thinking...";
+‎
+‎  addMessage("user", text);
+‎  history.push({role:"user", content:text});
+‎  $("status").textContent = "JANI jawab soch rahi hai... 💭";
+‎
+‎  try {
+‎    /*
+‎      REAL AI CONNECTION:
+‎      When you deploy this page with the secure Node.js backend,
+‎      replace the localReply(text) line below with the fetch call
+‎      shown in the project instructions.
+‎    */
+‎    await new Promise(resolve => setTimeout(resolve, 450));
+‎    const answer = localReply(text);
+‎    addMessage("assistant", answer);
+‎    history.push({role:"assistant", content:answer});
+‎    history = history.slice(-20);
+‎  } catch (e) {
+‎    addMessage("assistant", "Oops! Kuch masla hua. Dobara try karo.");
+‎  } finally {
+‎    busy = false;
+‎    send.disabled = false;
+‎    $("online").textContent = "Tumhari bestie • Ready";
+‎    $("status").textContent = "Aur sunao boss? 😜";
+‎    input.focus();
+‎  }
+‎}
+‎
+‎form.addEventListener("submit", e => {
+‎  e.preventDefault();
+‎  const text = input.value.trim();
+‎  if (!text) return;
+‎  input.value = "";
+‎  input.style.height = "45px";
+‎  reply(text);
+‎});
+‎
+‎input.addEventListener("input", () => {
+‎  input.style.height = "45px";
+‎  input.style.height = Math.min(input.scrollHeight, 120) + "px";
+‎});
+‎
+‎input.addEventListener("keydown", e => {
+‎  if (e.key === "Enter" && !e.shiftKey) {
+‎    e.preventDefault();
+‎    form.requestSubmit();
+‎  }
+‎});
+‎
+‎$("clear").addEventListener("click", () => {
+‎  if (busy) return;
+‎  history = [];
+‎  chat.replaceChildren();
+‎  const welcome = document.createElement("div");
+‎  welcome.className = "welcome";
+‎  welcome.textContent = "New chat, new vibes! 👑 Bolo boss, kya scene hai? ❤️";
+‎  chat.appendChild(welcome);
+‎  $("status").textContent = "Fresh chat ready!";
+‎});
+‎
+‎$("mode").addEventListener("change", () => {
+‎  $("status").textContent = "JANI ka mood badal gaya: " + $("mode").selectedOptions[0].text;
+‎});
+‎</script>
+‎</body>
+‎</html>
+‎
