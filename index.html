@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jani AI - Sahab AI66</title>
+<style>
+body{margin:0;background:#0a0a0a;color:#fff;font-family:sans-serif;display:flex;flex-direction:column;height:100vh}
+header{padding:15px;text-align:center;background:#111;border-bottom:1px solid #222;font-weight:bold;font-size:20px}
+#chat{flex:1;overflow:auto;padding:15px;display:flex;flex-direction:column;gap:10px}
+.msg{padding:12px 15px;border-radius:15px;max-width:80%}
+.user{background:#7c3aed;align-self:flex-end}
+.bot{background:#1f1f1f;align-self:flex-start;border:1px solid #333}
+#box{display:flex;padding:10px;background:#111;gap:8px}
+input{flex:1;padding:12px;border-radius:25px;border:1px solid #333;background:#1a1a1a;color:#fff;outline:none}
+button{padding:12px 20px;border-radius:25px;border:0;background:#7c3aed;color:#fff;font-weight:bold}
+</style>
+</head>
+<body>
+<header>👑 JANI AI - Sahab AI66</header>
+<div id="chat"><div class="msg bot">Salam Sahab! Main Jani AI hun, hukam karo? ❤️</div></div>
+<div id="box"><input id="inp" placeholder="Sahab kuch likho..."><button onclick="send()">Bhejo</button></div>
+<script>
+const GROQ_KEY="gsk_tu6N8p2XrYq1ZbV7cM4jK9hLdFgQsWx3EoAuBiDnJl";
+async function send(){
+ let t=document.getElementById('inp').value; if(!t) return;
+ let c=document.getElementById('chat');
+ c.innerHTML+=`<div class="msg user">${t}</div>`; document.getElementById('inp').value='';
+ let d=document.createElement('div'); d.className='msg bot'; d.innerText='Soch raha hun...'; c.appendChild(d); c.scrollTop=c.scrollHeight;
+ try{
+  let r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+GROQ_KEY},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"system",content:"You are Jani AI, made by Sahab AI66. Reply in Roman Urdu friendly style. Call user Sahab."},{role:"user",content:t}]})});
+  let j=await r.json(); d.innerText=j.choices[0].message.content;
+ }catch(e){d.innerText="Sahab API Key ka masla hai, dobara check karo!";}
+ c.scrollTop=c.scrollHeight;
+}
+</script>
+</body>
+  </html>
